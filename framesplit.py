@@ -34,4 +34,4 @@ def sample_and_save_frames(video_path, output_dir, num_frames=20):
 
 # Example usage
 # from glob import glob
-# sample_and_save_frames(glob(f"{"path_to_video_folder"}/*.*") path_to_output_directory)
+# sample_and_save_frames(glob(f"{"path to video"}/*.*") path_to_output_directory)
