@@ -26,7 +26,7 @@ def sample_and_save_frames(video, num_frames=10):
 
 inferencer = LVFaceONNXInferencer(
     model_path="LVFace-B_Glint360K.onnx",
-    use_gpu=False
+    use_gpu=True
 )
 
 embs = []
