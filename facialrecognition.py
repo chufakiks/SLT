@@ -25,7 +25,7 @@ def sample_and_save_frames(video, num_frames=10):
     return frames
 
 inferencer = LVFaceONNXInferencer(
-    model_path="LVFace-B_Glint360K.onnx",
+    model_path="LVFace-L_Glint360K.onnx",
     use_gpu=True
 )
 
