@@ -36,7 +36,7 @@ video_paths = []
 temp_frame_path = "temp_frame.jpg"
 
 try:
-    for video in Path("work3/s235253/raw_vid").iterdir():      
+    for video in Path("/work3/s235253/raw_vid").iterdir():      
         emb = []
         frames = sample_and_save_frames(video, num_frames=10)
         video_paths.append(video)
