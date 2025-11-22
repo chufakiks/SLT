@@ -65,19 +65,19 @@ finally:
     if Path(temp_frame_path).exists():
         Path(temp_frame_path).unlink()
 
-print(f"Extracted {len(embs)} video embeddings")
+np.save("video_embeddings.npy", np.array(embs))
 
-clustering = AgglomerativeClustering(n_clusters=None, distance_threshold=0.5, metric='cosine', linkage='average')
-labels = clustering.fit_predict(embs)
+#clustering = AgglomerativeClustering(n_clusters=None, distance_threshold=0.5, metric='cosine', linkage='average')
+#labels = clustering.fit_predict(embs)
 
-csv_path = "video_person_mapping.csv"
-with open(csv_path, 'w', newline='') as f:
-    writer = csv.writer(f)
+#csv_path = "video_person_mapping.csv"
+#with open(csv_path, 'w', newline='') as f:
+    #writer = csv.writer(f)
     # Header
-    writer.writerow(['video_name', 'person_id'])
+    #writer.writerow(['video_name', 'person_id'])
     # Write data
-    for video_path, label in zip(video_paths, labels):
-        writer.writerow([video_path.name, label])
+    #for video_path, label in zip(video_paths, labels):
+        #writer.writerow([video_path.name, label])
 
 
 
