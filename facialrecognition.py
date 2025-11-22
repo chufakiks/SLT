@@ -51,6 +51,7 @@ try:
                 continue
             if isinstance(framefeat, np.ndarray) and not np.isfinite(framefeat).all():
                 continue
+            print("emb extracted")
             emb.append(framefeat)
         
         #skip empty embeddings
