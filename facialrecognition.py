@@ -44,8 +44,18 @@ try:
         for frame in frames:
             cv2.imwrite(temp_frame_path, frame)
             framefeat = inferencer.infer_from_image(temp_frame_path)
+            # Skip if inference failed or returned None/empty
+            if framefeat is None:
+                continue
+            if isinstance(framefeat, np.ndarray) and framefeat.size == 0:
+                continue
+            if isinstance(framefeat, np.ndarray) and not np.isfinite(framefeat).all():
+                continue
             emb.append(framefeat)
         
+        #skip empty embeddings
+        if len(emb) == 0:
+            continue
         emb = np.mean(emb, axis=0)
         emb = normalize(emb.reshape(1, -1), norm='l2')
         embs.append(emb.flatten())
@@ -64,7 +74,7 @@ csv_path = "video_person_mapping.csv"
 with open(csv_path, 'w', newline='') as f:
     writer = csv.writer(f)
     # Header
-    writer.writerow(['video_name', 'person_id', 'person_label'])
+    writer.writerow(['video_name', 'person_id'])
     # Write data
     for video_path, label in zip(video_paths, labels):
         writer.writerow([video_path.name, label])
