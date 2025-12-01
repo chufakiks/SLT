@@ -1,8 +1,6 @@
-import csv
 from pathlib import Path
 import cv2
 from inference_onnx import LVFaceONNXInferencer
-from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import normalize
 import numpy as np
 
@@ -30,7 +28,6 @@ inferencer = LVFaceONNXInferencer(
 )
 
 embs = []
-video_paths = []
 
 # Single temp file to reuse
 temp_frame_path = "temp_frame.jpg"
@@ -39,7 +36,6 @@ try:
     for video in Path("/work3/s235253/raw_vid").iterdir():      
         emb = []
         frames = sample_and_save_frames(video, num_frames=10)
-        video_paths.append(video)
 
         for frame in frames:
             cv2.imwrite(temp_frame_path, frame)
@@ -67,19 +63,6 @@ finally:
         Path(temp_frame_path).unlink()
 
 np.save("video_embeddings.npy", np.array(embs))
-
-#clustering = AgglomerativeClustering(n_clusters=None, distance_threshold=0.5, metric='cosine', linkage='average')
-#labels = clustering.fit_predict(embs)
-
-#csv_path = "video_person_mapping.csv"
-#with open(csv_path, 'w', newline='') as f:
-    #writer = csv.writer(f)
-    # Header
-    #writer.writerow(['video_name', 'person_id'])
-    # Write data
-    #for video_path, label in zip(video_paths, labels):
-        #writer.writerow([video_path.name, label])
-
 
 
 
