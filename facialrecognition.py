@@ -1,4 +1,3 @@
-import csv
 from pathlib import Path
 import cv2
 from inference_onnx import LVFaceONNXInferencer
