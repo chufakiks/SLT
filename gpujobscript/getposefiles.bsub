@@ -28,6 +28,6 @@
 #BSUB -e Output_pose.err 
 
 # here follow the commands you want to execute with input.in as the input file
-cd /work3/s235353
+cd /work3/s235253
 source venv/bin/activate
 videos_to_poses --format mediapipe --directory ASLSTEMdata/zipoutput/videos
