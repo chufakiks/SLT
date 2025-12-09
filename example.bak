@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<ANNOTATION_DOCUMENT AUTHOR="sign-language-processing/transcription" DATE="2025-12-03T19:26:42+09:00" VERSION="2.8" FORMAT="2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.mpi.nl/tools/elan/EAFv2.8.xsd">
+<ANNOTATION_DOCUMENT AUTHOR="sign-language-processing/transcription" DATE="2025-12-03T18:35:10+09:00" VERSION="2.8" FORMAT="2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.mpi.nl/tools/elan/EAFv2.8.xsd">
 	<HEADER>
 		<MEDIA_DESCRIPTOR MEDIA_URL="example.pose" MIME_TYPE="application/pose" />
 		<PROPERTY NAME="lastUsedAnnotation">0</PROPERTY>
