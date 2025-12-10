@@ -13,7 +13,7 @@
 ### -- specify that we want the job to get killed if it exceeds 5 GB per core/slot -- 
 #BSUB -M 5GB
 ### -- set walltime limit: hh:mm -- 
-#BSUB -W 24:00 
+#BSUB -W 72:00 
 ### -- set the email address -- 
 # please uncomment the following line and put in your e-mail address,
 # if you want to receive e-mail notifications on a non-default address
@@ -30,4 +30,4 @@
 # here follow the commands you want to execute with input.in as the input file
 cd /work3/s235253
 source venv/bin/activate
-videos_to_poses --format mediapipe --directory ASLSTEMdata/zipoutput/videos
+videos_to_poses --format mediapipe -num-workers 10 --recursive --directory /work3/s235253/SLT/openaslminisource
