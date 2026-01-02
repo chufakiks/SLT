@@ -89,9 +89,9 @@ def link_cropped_videos_to_tsv(cropped_video_dir, tsv_path, output_csv=None):
     return mappings
 
 def main():
-    cropped_video_dir = "/work3/s235253/openaslcropeed"
-    tsv_path = "/home/user/SLT/openasl-v1.0.tsv"
-    output_csv = "/work3/s235253cropped_videos_mapping.csv"
+    cropped_video_dir = "/work3/s235253/openaslcropped"
+    tsv_path = "/work3/s235253/SLT/openasl-v1.0.tsv"
+    output_csv = "/work3/s235253/cropped_videos_mapping.csv"
 
     mappings = link_cropped_videos_to_tsv(
         cropped_video_dir,
