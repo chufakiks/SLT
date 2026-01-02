@@ -1,125 +1,107 @@
 #!/usr/bin/env python3
 """
-Script to link cropped videos from OpenASL's crop_video to the TSV metadata file.
-This creates a mapping between cropped video files and their corresponding TSV entries.
+Link cropped OpenASL videos to TSV metadata using (yid, start, end).
 """
 
-import os
-import re
 import csv
 from pathlib import Path
 
-def extract_row_index_from_filename(filename):
+def parse_filename(filename):
     """
-    Extract the TSV row index from the cropped video filename.
-    Expected format: {hash}-{row_index}_{time1}_{time2}.mp4
-    Example: 00001167060947993015-3717_3_38.mp4 -> 3717
+    Expected format:
+    <yid>-HH:MM:SS.mmm-HH:MM:SS.mmm.mp4
     """
-    # Remove .mp4 extension
-    name = filename.replace('.mp4', '')
+    if not filename.endswith(".mp4"):
+        return None
 
-    # Pattern: {anything}-{digits}_{digits}_{digits}
-    match = re.search(r'-(\d+)_\d+_\d+$', name)
-    if match:
-        return int(match.group(1))
+    name = filename[:-4]
+    parts = name.split("-")
 
-    return None
+    if len(parts) != 3:
+        return None
+
+    return {
+        "yid": parts[0],
+        "start": parts[1],
+        "end": parts[2],
+    }
 
 def link_cropped_videos_to_tsv(cropped_video_dir, tsv_path, output_csv=None):
-    """
-    Create a mapping between cropped videos and TSV entries.
-
-    Args:
-        cropped_video_dir: Directory containing cropped .mp4 files
-        tsv_path: Path to the openasl-v1.0.tsv file
-        output_csv: Optional path to save the mapping as CSV
-
-    Returns:
-        List of dictionaries with video files linked to TSV metadata
-    """
-    # Read the TSV file
     print(f"Reading TSV file from {tsv_path}...")
+
+    # Load TSV and build lookup
     tsv_rows = []
-    with open(tsv_path, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f, delimiter='\t')
-        for row in reader:
+    tsv_lookup = {}
+
+    with open(tsv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        for idx, row in enumerate(reader):
             tsv_rows.append(row)
-    print(f"Loaded {len(tsv_rows)} entries from TSV")
+            key = (row["yid"], row["start"], row["end"])
+            tsv_lookup[key] = (idx, row)
 
-    # Find all cropped video files
-    video_files = list(Path(cropped_video_dir).glob('*.mp4'))
-    print(f"Found {len(video_files)} video files in {cropped_video_dir}")
+    print(f"Loaded {len(tsv_rows)} TSV entries")
 
-    # Create mapping
+    video_files = list(Path(cropped_video_dir).glob("*.mp4"))
+    print(f"Found {len(video_files)} cropped videos")
+
     mappings = []
-    for video_path in video_files:
-        filename = video_path.name
-        row_idx = extract_row_index_from_filename(filename)
 
-        if row_idx is not None:
-            # Row index is 0-based
-            if row_idx < len(tsv_rows):
-                tsv_row = tsv_rows[row_idx]
-                mappings.append({
-                    'cropped_video_path': str(video_path),
-                    'cropped_video_filename': filename,
-                    'tsv_row_index': row_idx,
-                    'vid': tsv_row['vid'],
-                    'yid': tsv_row['yid'],
-                    'start': tsv_row['start'],
-                    'end': tsv_row['end'],
-                    'raw_text': tsv_row['raw-text'],
-                    'tokenized_text': tsv_row['tokenized-text'],
-                    'gloss': tsv_row.get('gloss', ''),
-                    'split': tsv_row['split']
-                })
-            else:
-                print(f"Warning: Row index {row_idx} from {filename} exceeds TSV length")
-        else:
-            print(f"Warning: Could not extract row index from {filename}")
+    for video_path in video_files:
+        info = parse_filename(video_path.name)
+        if info is None:
+            print(f"Warning: Unrecognized filename format: {video_path.name}")
+            continue
+
+        key = (info["yid"], info["start"], info["end"])
+
+        if key not in tsv_lookup:
+            print(f"Warning: No TSV match for {video_path.name}")
+            continue
+
+        row_idx, tsv_row = tsv_lookup[key]
+
+        mappings.append({
+            "cropped_video_path": str(video_path),
+            "cropped_video_filename": video_path.name,
+            "tsv_row_index": row_idx,
+            "vid": tsv_row["vid"],
+            "yid": tsv_row["yid"],
+            "start": tsv_row["start"],
+            "end": tsv_row["end"],
+            "raw_text": tsv_row["raw-text"],
+            "tokenized_text": tsv_row["tokenized-text"],
+            "gloss": tsv_row.get("gloss", ""),
+            "split": tsv_row["split"],
+        })
 
     print(f"\nSuccessfully mapped {len(mappings)} videos to TSV entries")
 
-    # Save to CSV if requested
     if output_csv and mappings:
-        with open(output_csv, 'w', newline='', encoding='utf-8') as f:
-            fieldnames = ['cropped_video_path', 'cropped_video_filename', 'tsv_row_index',
-                         'vid', 'yid', 'start', 'end', 'raw_text', 'tokenized_text',
-                         'gloss', 'split']
+        with open(output_csv, "w", newline="", encoding="utf-8") as f:
+            fieldnames = mappings[0].keys()
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(mappings)
+
         print(f"Saved mapping to {output_csv}")
 
     return mappings
 
 def main():
-    # Configuration
-    cropped_video_dir = "/home/user/SLT/newdir"
+    cropped_video_dir = "/work3/s235253/openaslcropeed"
     tsv_path = "/home/user/SLT/openasl-v1.0.tsv"
-    output_csv = "/home/user/SLT/cropped_videos_mapping.csv"
+    output_csv = "/work3/s235253cropped_videos_mapping.csv"
 
-    # Create the mapping
     mappings = link_cropped_videos_to_tsv(
-        cropped_video_dir=cropped_video_dir,
-        tsv_path=tsv_path,
-        output_csv=output_csv
+        cropped_video_dir,
+        tsv_path,
+        output_csv,
     )
 
-    # Display sample results
-    print("\n" + "="*80)
-    print("Sample mappings:")
-    print("="*80)
-    for row in mappings[:5]:  # Show first 5
-        print(f"\nVideo: {row['cropped_video_filename']}")
-        print(f"  TSV Row: {row['tsv_row_index']}")
-        print(f"  Video ID: {row['vid']}")
-        print(f"  YouTube ID: {row['yid']}")
-        print(f"  Time Range: {row['start']} - {row['end']}")
-        print(f"  Text: {row['raw_text']}")
-        print(f"  Split: {row['split']}")
-
-    return mappings
+    print("\nSample mappings:")
+    for row in mappings[:5]:
+        print(row["cropped_video_filename"], "→ TSV row", row["tsv_row_index"])
 
 if __name__ == "__main__":
     main()
