@@ -10,21 +10,25 @@ def parse_filename(filename):
     """
     Expected format:
     <yid>-HH:MM:SS.mmm-HH:MM:SS.mmm.mp4
+    where <yid> may contain hyphens.
     """
     if not filename.endswith(".mp4"):
         return None
 
     name = filename[:-4]
-    parts = name.split("-")
 
-    if len(parts) != 3:
+    # Split from the right: last two '-' separate timestamps
+    try:
+        yid, start, end = name.rsplit("-", 2)
+    except ValueError:
         return None
 
     return {
-        "yid": parts[0],
-        "start": parts[1],
-        "end": parts[2],
+        "yid": yid,
+        "start": start,
+        "end": end,
     }
+
 
 def link_cropped_videos_to_tsv(cropped_video_dir, tsv_path, output_csv=None):
     print(f"Reading TSV file from {tsv_path}...")
